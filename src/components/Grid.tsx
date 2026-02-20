@@ -1,5 +1,5 @@
 import { words } from "../mock/words"
-import Card from "./Card"
+import Card from "./CardFlip"
 
 
 const Grid = () => {
@@ -9,7 +9,8 @@ const Grid = () => {
     >
       {
         words.map((word) => (
-          <Card 
+          <Card
+            key={word.id} 
             word={word}
           />
         ))

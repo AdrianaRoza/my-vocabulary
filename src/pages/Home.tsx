@@ -1,5 +1,4 @@
 import Grid from "../components/Grid"
-
 const Home = () => {
 	return (
 		<div className="px-5">
