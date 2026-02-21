@@ -1,8 +1,9 @@
 import Grid from "../components/Grid"
+import Navbar from "../components/Navbar"
 const Home = () => {
 	return (
-		<div className="px-5">
-			Eu sou a Home
+		<div className="px-1">
+			<Navbar />
 			<Grid />
 		</div>
 	)

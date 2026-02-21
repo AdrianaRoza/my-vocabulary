@@ -25,4 +25,29 @@ export const words: Word[] = [
     },
     urlAudio: "pathOfSound",
   },
+
+
+  {
+    id: "axftri01",
+    english: "run",
+    portuguese: "correr",
+    image: {
+      id: "iddaimage",
+      name: "run",
+      url: run,
+    },
+    urlAudio: "pathOfSound",
+  },
+  {
+    id: "axftri02",
+    english: "api",
+    portuguese: "api",
+    image: {
+      id: "iddaimage02",
+      name: "api",
+      url: api,
+    },
+    urlAudio: "pathOfSound",
+  },
 ];
+

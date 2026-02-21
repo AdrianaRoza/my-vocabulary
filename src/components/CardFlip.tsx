@@ -10,7 +10,7 @@ const Card = ({word}: CardProps) => {
 
 	return (
 		<div 
-			className="w-44 aspect-3/4 perspective"
+			className="w-full aspect-5/6 perspective"
 			onClick={() => setFlipped(!flipped)}
 		>
 
