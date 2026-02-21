@@ -10,7 +10,7 @@ const Card = ({word}: CardProps) => {
 
 	return (
 		<div 
-			className="h-48 perspective"
+			className="w-44 aspect-3/4 perspective"
 			onClick={() => setFlipped(!flipped)}
 		>
 
@@ -24,7 +24,7 @@ const Card = ({word}: CardProps) => {
           <img
             src={word.image.url}
             alt={word.image.name}
-            className="w-full h-48 object-cover
+            className="w-full h-full object-cover
             transition duration-700 ease-in-out hover:scale-105"
           />
         </div>
