@@ -13,6 +13,7 @@ export const words: Word[] = [
       url: run,
     },
     urlAudio: "pathOfSound",
+    categoryIds: ["body"]
   },
   {
     id: "axftri02",
@@ -24,11 +25,12 @@ export const words: Word[] = [
       url: api,
     },
     urlAudio: "pathOfSound",
+    categoryIds: ["body"]
   },
 
 
   {
-    id: "axftri01",
+    id: "axftri03",
     english: "run",
     portuguese: "correr",
     image: {
@@ -37,9 +39,10 @@ export const words: Word[] = [
       url: run,
     },
     urlAudio: "pathOfSound",
+    categoryIds: ["food"]
   },
   {
-    id: "axftri02",
+    id: "axftri04",
     english: "api",
     portuguese: "api",
     image: {
@@ -48,6 +51,7 @@ export const words: Word[] = [
       url: api,
     },
     urlAudio: "pathOfSound",
+    categoryIds: ["greeting"]
   },
 ];
 
