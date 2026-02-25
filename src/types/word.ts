@@ -6,4 +6,5 @@ export interface Word {
   portuguese: string;
   image: Image;
   urlAudio: string;
+  categoryIds?: string[];
 }
