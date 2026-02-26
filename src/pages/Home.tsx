@@ -2,8 +2,6 @@ import { useState } from "react";
 import CategoryCard from "../components/CategoryCard"
 import { categories as initialCategories } from "../mock/categories"
 import type { Category } from "../types/category"
-import Navbar from "../components/Navbar"
-
 
 export default function Home() {
   const [categories, setCategories] = useState<Category[]>(initialCategories)
@@ -24,7 +22,6 @@ export default function Home() {
 
   return (
     <>
-			<Navbar />
 			<div className="p-4">
 				{/* Criar categoria */}
 				<div className="mb-6 flex gap-2">
