@@ -1,5 +1,5 @@
-import type { Word } from "../types/word";
-import run from "../assets/run.jpg";
+import type { Word } from "../types/word"
+import run from "../assets/run.jpg"
 import api from "../assets/api-integration-logistics.png"
 
 export const words: Word[] = [

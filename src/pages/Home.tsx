@@ -1,25 +1,25 @@
 import { useState } from "react";
-import CategoryCard from "../components/CategoryCard";
-import { categories as initialCategories } from "../mock/categories";
-import type { Category } from "../types/category";
-import Navbar from "../components/Navbar";
+import CategoryCard from "../components/CategoryCard"
+import { categories as initialCategories } from "../mock/categories"
+import type { Category } from "../types/category"
+import Navbar from "../components/Navbar"
 
 
 export default function Home() {
-  const [categories, setCategories] = useState<Category[]>(initialCategories);
-  const [newCategory, setNewCategory] = useState("");
+  const [categories, setCategories] = useState<Category[]>(initialCategories)
+  const [newCategory, setNewCategory] = useState("")
 
 	// Create New Category
   function handleAddCategory() {
-    if (!newCategory.trim()) return;
+    if (!newCategory.trim()) return
 
     const newItem: Category = {
       id: newCategory.toLowerCase(),
       name: newCategory
     };
 
-    setCategories([...categories, newItem]);
-    setNewCategory("");
+    setCategories([...categories, newItem])
+    setNewCategory("")
   }
 
   return (
