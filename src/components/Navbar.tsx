@@ -2,9 +2,16 @@
 
 const Navbar = () => {
   return (
-    <nav className="bg-gray-900 text-white p-4 w-full shadow-md">
-      <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
-        <div className="text-xl font-bold">
+    <nav 
+      className="bg-gray-900 text-white p-4 w-full shadow-md"
+    >
+      <div 
+        className="w-full max-w-7xl mx-auto flex justify-between 
+          items-center"
+      >
+        <div 
+          className="text-xl font-bold"
+        >
           MyVocabulary
         </div>
 
