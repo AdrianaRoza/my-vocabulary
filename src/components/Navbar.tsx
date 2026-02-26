@@ -40,18 +40,19 @@ const Navbar = () => {
       </nav>
 
       {/* MENU FLUTUANTE */}
-      {menuOpen && (
-        <div
-          className={`fixed inset-0 z-40 transition-opacity duration-300
-          ${menuOpen ? "bg-black/40 opacity-100 pointer-events-auto" : "bg-black/40 opacity-0 pointer-events-none"}`}
-        >
           <div
-            className={`bg-gray-800 text-white w-64 h-full p-6 shadow-lg transform transition-transform duration-300
-            ${menuOpen ? "translate-x-0" : "-translate-x-full"}`}
-            onMouseLeave={() => {
-              setMenuOpen(false)
-              setCategoryOpen(false)
-            }}>
+            className={`fixed inset-0 z-40 transition-opacity duration-900
+            ${menuOpen ? "bg-black/40 opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+          >
+            <div
+              className={`bg-gray-800 text-white w-64 h-full p-6 shadow-lg
+              transform transition-transform duration-900
+              ${menuOpen ? "translate-x-0" : "-translate-x-full"}`}
+              onMouseLeave={() => {
+                setMenuOpen(false)
+                setCategoryOpen(false)
+              }}
+            >
 
             {/* Fechar */}
             <button
@@ -103,7 +104,6 @@ const Navbar = () => {
             </ul>
           </div>
         </div>
-      )}
     </>
   )
 }
