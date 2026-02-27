@@ -2,7 +2,6 @@ import { useState } from "react";
 import CategoryCard from "../components/CategoryCard"
 import { categories as initialCategories } from "../mock/categories"
 import type { Category } from "../types/category"
-import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const [categories, setCategories] = useState<Category[]>(initialCategories)
