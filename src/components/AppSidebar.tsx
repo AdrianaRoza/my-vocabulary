@@ -7,7 +7,6 @@ import {
   SidebarGroupAction,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuAction,
   SidebarMenuBadge,
@@ -15,12 +14,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-import { 
-  DropdownMenuTrigger, 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem 
-} from "./ui/dropdown-menu"
 
 import { 
   Collapsible, 
@@ -30,29 +23,9 @@ import {
  
 export function AppSidebar() {
   return (
-    <Sidebar>
+    <Sidebar className="">
 
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  Select Workspace
-                  <ChevronDown className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
-                <DropdownMenuItem>
-                  <span>Acme Inc</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-
-      <SidebarContent>
+      <SidebarContent className="mt-10">
 
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
@@ -69,7 +42,7 @@ export function AppSidebar() {
           <SidebarGroup>
             <SidebarGroupLabel asChild>
               <CollapsibleTrigger>
-                Help
+                Categorias
                 <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-270" />
               </CollapsibleTrigger>
             </SidebarGroupLabel>
@@ -89,12 +62,25 @@ export function AppSidebar() {
 
 
               <SidebarMenu>
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <SidebarMenuItem key={index}>
-                    <SidebarMenuButton>{index}</SidebarMenuButton>
+ 
+                  <SidebarMenuItem>
+                    <SidebarMenuButton>
+                      <a href="/category/body">
+                        <span>Body</span>
+                      </a>
+                    </SidebarMenuButton>
                     <SidebarMenuBadge>24</SidebarMenuBadge>
                   </SidebarMenuItem>
-                ))}
+
+                  <SidebarMenuItem>
+                    <SidebarMenuButton>
+                      <a href="/category/food">
+                        <span>Food</span>
+                      </a>
+                    </SidebarMenuButton>
+                    <SidebarMenuBadge>24</SidebarMenuBadge>
+                  </SidebarMenuItem>
+
               </SidebarMenu>
 
 
