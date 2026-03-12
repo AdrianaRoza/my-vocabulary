@@ -6,24 +6,23 @@ const Navbar = () => {
     <>
       {/* NAVBAR */}
       <nav 
-        className="bg-gray-900 text-white p-4 w-full shadow-md 
-          fixed top-0 left-0 z-50"
+        className="bg-gray-900 text-white p-4 w-full"
       >
         <div 
-          className="max-w-7xl mx-auto flex items-center
-            justify-between relative"
+          className="relative flex justify-end"
         >
 
           {/* Nome centralizado */}
           <div 
-            className="absolute left-1/2 transform -translate-x-1/2 
-              text-xl font-bold"
+            className="absolute left-1/2 transform -translate-x-1/2"
           >
-            {currentUser?.name}
+            My Vocabulary
+
           </div>
 
-          {/* Espaço vazio para equilibrar */}
-          <div className="w-6"></div>
+          <div className="">
+            {currentUser?.name}
+          </div>
         </div>
       </nav>
     </>
