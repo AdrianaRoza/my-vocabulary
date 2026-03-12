@@ -1,6 +1,7 @@
+import { useUserStore } from "../store/userStore"
 
 const Navbar = () => {
-
+  const currentUser = useUserStore((state) => state.currentUser)
   return (
     <>
       {/* NAVBAR */}
@@ -18,7 +19,7 @@ const Navbar = () => {
             className="absolute left-1/2 transform -translate-x-1/2 
               text-xl font-bold"
           >
-            MyVocabulary
+            {currentUser?.name}
           </div>
 
           {/* Espaço vazio para equilibrar */}

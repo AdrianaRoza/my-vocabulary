@@ -13,7 +13,8 @@ export const words: Word[] = [
       url: run,
     },
     urlAudio: "pathOfSound",
-    categoryIds: ["body"]
+    categoryIds: ["body"],
+    userId: '01002'
   },
   {
     id: "axftri02",
@@ -25,7 +26,8 @@ export const words: Word[] = [
       url: api,
     },
     urlAudio: "pathOfSound",
-    categoryIds: ["body"]
+    categoryIds: ["body"],
+     userId: '01002'
   },
 
 
@@ -39,7 +41,8 @@ export const words: Word[] = [
       url: run,
     },
     urlAudio: "pathOfSound",
-    categoryIds: ["food"]
+    categoryIds: ["food"],
+     userId: '01003'
   },
   {
     id: "axftri04",
@@ -51,7 +54,8 @@ export const words: Word[] = [
       url: api,
     },
     urlAudio: "pathOfSound",
-    categoryIds: ["greeting"]
+    categoryIds: ["greeting"],
+     userId: '01002'
   },
 ];
 

@@ -1,48 +1,19 @@
-import { useState } from "react";
-import CategoryCard from "../components/CategoryCard"
-import { categories as initialCategories } from "../mock/categories"
-import type { Category } from "../types/category"
+import Card from "../components/Card"
+import { users } from "../mock/users"
 
 export default function Home() {
-  const [categories, setCategories] = useState<Category[]>(initialCategories)
-  const [newCategory, setNewCategory] = useState("")
-
-	// Create New Category
-  function handleAddCategory() {
-    if (!newCategory.trim()) return
-
-    const newItem: Category = {
-      id: newCategory.toLowerCase(),
-      name: newCategory
-    };
-
-    setCategories([...categories, newItem])
-    setNewCategory("")
-  }
 
   return (
     <>
-			<div className="p-4">
-				{/* Criar categoria */}
-				<div className="mb-6 flex gap-2">
-					<input
-						value={newCategory}
-						onChange={(e) => setNewCategory(e.target.value)}
-						placeholder="New category"
-						className="border p-2 rounded"
-					/>
-					<button
-						onClick={handleAddCategory}
-						className="bg-blue-500 text-white px-4 rounded"
-					>
-						Create
-					</button>
-				</div>
+			<div className="p-10">
 
 				{/* Lista */}
 				<div className="grid grid-cols-2 gap-4">
-					{categories.map((category) => (
-						<CategoryCard key={category.id} category={category} />
+					{users.map((user) => (
+						<Card 
+              key={user.id} 
+              user={user} 
+            />
 					))}
 				</div>
 			</div>

@@ -3,10 +3,11 @@ import { words } from "../mock/words"
 import Card from "../components/CardFlip"
 
 const Category = () => {
-  const { id } = useParams()
+  const { categoryId, userId } = useParams()
 
   const filteredWords = words.filter(word =>
-    word.categoryIds?.includes(id || "")
+    word.categoryIds?.includes(categoryId || "") &&
+    word.userId === userId
   )
 
   return (

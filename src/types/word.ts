@@ -7,4 +7,5 @@ export interface Word {
   image: Image;
   urlAudio: string;
   categoryIds?: string[];
+   userId: string
 }
