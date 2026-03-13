@@ -28,7 +28,7 @@ const Categories = () => {
 		<div className="ml-4">
 			<button
 				onClick={() => setShowForm(true)}
-				className="bg-gradient-to-l from bg-gray-900 to-blue-800 
+				className="bg-linear-to-l from-gray-900 to-blue-800 
 					text-white px-4 py-2 rounded ml-3"
 				>
 				+ Adicionar Categoria
@@ -41,7 +41,7 @@ const Categories = () => {
 						<div
 							key={index}
 							className="w-40 h-56 rounded-2xl 
-								bg-gradient-to-r from bg-gray-900 to-blue-800 
+								bg-linear-to-r from-gray-900 to-blue-800 
 								text-white shadow-lg
 								flex items-center justify-center text-lg font-medium
 								hover:scale-105 hover:shadow-2xl transition"
