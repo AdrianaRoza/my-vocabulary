@@ -20,7 +20,8 @@ const Navbar = () => {
 
           </div>
 
-          <div className="">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-600 rounded-full"></div>
             {currentUser?.name}
           </div>
         </div>

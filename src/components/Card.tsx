@@ -9,8 +9,11 @@ const Card = ({ user }: any) => {
   return (
     <Link
       to={`/profile/${user.id}`}
-      className="p-6 bg-white shadow rounded-xl text-center 
-        hover:scale-105 transition"
+      className="w-40 h-56 rounded-2xl 
+          bg-gradient-to-l from bg-gray-900 to-blue-800 
+          text-white shadow-lg
+          flex items-center justify-center text-lg font-medium
+          hover:scale-105 hover:shadow-2xl transition"
     >
       {user.name}
     </Link>

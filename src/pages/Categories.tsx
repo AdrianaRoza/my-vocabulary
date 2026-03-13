@@ -11,11 +11,11 @@ const Categories = () => {
   )
 
 	return (
-		<div className="">
+		<div className="ml-3">
 			Categorias
 
 			{/* Lista */}
-				<div className="grid grid-cols-2 gap-4">
+				<div className="grid grid-cols-4 mt-3 ml-3 gap-4">
 					{filteredCategory.map((category) => (
 						<CategoryCard key={category.id} category={category} />
 					))}
