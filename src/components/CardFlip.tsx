@@ -18,6 +18,7 @@ interface CardProps {
 const CardFlip = ({ word, userId, categoryId, onWordUpdated, onWordDeleted }: CardProps) => {
   const [flipped, setFlipped] = useState(false)
   const [showTranslation, setShowTranslation] = useState(false)
+  // Estado local para suportar a edição provisória no frontend.
   const [editedWord, setEditedWord] = useState(word)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -78,6 +79,7 @@ const CardFlip = ({ word, userId, categoryId, onWordUpdated, onWordDeleted }: Ca
     }
   }
 
+  // Alterna entre original e tradução no verso do card.
   const handleTranslate = (e: React.MouseEvent) => {
     e.stopPropagation()
     setShowTranslation((current) => !current)

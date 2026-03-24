@@ -7,13 +7,14 @@ import { getCategoriesByUser } from "../service/categoryApi"
 import { getWordsByCategory } from "../service/wordApi"
 
 export default function Home() {
-	const { user } = useAuthStore()
+  const { user } = useAuthStore()
   const [categoriesCount, setCategoriesCount] = useState<number | undefined>(undefined)
   const [wordsCount, setWordsCount] = useState<number | undefined>(undefined)
 
   useEffect(() => {
     let isMounted = true
 
+    // Carrega os totais do usuário para exibir no card principal da home.
     const loadUserStats = async () => {
       if (!user?.id) {
         if (isMounted) {
@@ -61,10 +62,9 @@ export default function Home() {
 
   return (
     <div className="px-3 py-6 sm:p-6 md:p-10">
-      <h1 className="text-2xl font-semibold text-gray-800 mb-2">Início</h1>
-      <p className="text-gray-500 mb-6">Selecione o usuário para abrir o perfil.</p>
-
+      <h1 className="text-2xl font-semibold text-gray-800 mb-6 ml-5">Perfis de Usuários</h1>
       <Grid>
+        {/* Hoje a aplicação mostra o usuário autenticado; a estrutura já permite evoluir para múltiplos perfis */}
         <Card
           user={user}
           categoriesCount={categoriesCount}

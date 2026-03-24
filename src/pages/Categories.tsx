@@ -16,6 +16,7 @@ const Categories = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState("Estamos criando sua nova categoria")
 
+  // Recarrega a lista de categorias sempre que uma nova categoria for criada.
   const fetchCategories = async () => {
     if (!userId) return
 
@@ -130,6 +131,7 @@ const Categories = () => {
         />
       )}
 
+      {/* Botão de ação principal da página */}
       <button
         onClick={() => setShowForm(true)}
         className="bg-linear-to-l from-gray-900 to-blue-800 text-white px-4 py-2 rounded ml-3"

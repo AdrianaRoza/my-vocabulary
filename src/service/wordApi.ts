@@ -19,6 +19,7 @@ type GetWordsPayload = {
   categoryId: string
 }
 
+// Dados usados para criar uma nova palavra.
 type CreateWordPayload = {
   english: string
   userId: string
@@ -81,6 +82,7 @@ export const getWordsByCategory = async ({ userId, categoryId }: GetWordsPayload
   return response.data
 }
 
+// Cria uma nova palavra vinculada ao usuário e à categoria.
 export const createWord = async ({ english, userId, categoryId }: CreateWordPayload) => {
   const response = await apiClient.post<WordMutationResponse>("/api/vocabulary/word", {
     english,

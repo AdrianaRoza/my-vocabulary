@@ -9,6 +9,7 @@ import { getCategoriesByUser } from "../service/categoryApi"
 import kc from "../service/keycloak"
 import type { Category } from "../types/category"
 
+// Controla a abertura/fechamento do menu lateral.
 type SidebarProps = {
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -34,6 +35,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
   useEffect(() => {
     let isMounted = true
 
+    // Carrega as categorias dinamicamente para montar os submenus do sidebar.
     const loadCategories = async () => {
       if (!user?.id) {
         if (isMounted) setCategories([])
@@ -99,6 +101,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
         </li>
 
         <li>
+          {/* Abre e fecha a árvore de categorias */}
           <button
             onClick={() => {
               setIsCategoriesOpen((prev) => !prev)
@@ -125,6 +128,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
               </li>
 
               {categories.map((category) => (
+                // Cada categoria criada vira uma entrada navegável no menu lateral.
                 <li
                   key={category.id}
                   onClick={() => {

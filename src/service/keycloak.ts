@@ -1,5 +1,6 @@
 import Keycloak from "keycloak-js"
 
+// Variáveis lidas do ambiente para montar a configuração do Keycloak.
 const KEYCLOAK_URL = import.meta.env.VITE_KEYCLOAK_URL
 const REALM = import.meta.env.VITE_REALM
 const CLIENT_ID = import.meta.env.VITE_CLIENT_ID
@@ -14,6 +15,7 @@ const keycloakConfig = {
   clientId: CLIENT_ID
 }
 
+// Instância única de autenticação usada em toda a aplicação.
 const kc = new Keycloak(keycloakConfig)
 
 export default kc

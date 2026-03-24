@@ -13,6 +13,7 @@ type CreateItemModalProps = {
   children?: ReactNode
 }
 
+// Modal reutilizável para criação simples de categorias e palavras.
 const CreateItemModal = ({
   title,
   placeholder,
@@ -25,6 +26,7 @@ const CreateItemModal = ({
   isConfirmDisabled = false,
   children,
 }: CreateItemModalProps) => {
+  // Não renderiza nada enquanto o modal estiver fechado.
   if (!isOpen) return null
 
   return (

@@ -136,6 +136,7 @@ Rules:
     }
   }
 
+  // Atualiza a lista de palavras da categoria aberta.
   const fetchWords = async () => {
     if (!userId || !categoryId) return
 
@@ -165,6 +166,7 @@ Rules:
     void fetchWords()
   }, [categoryId, userId])
 
+  // Descobre o nome da categoria atual para exibir no título da página.
   useEffect(() => {
     void fetchCategoryTitle()
   }, [categoryId, userId])

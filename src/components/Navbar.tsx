@@ -7,6 +7,7 @@ import Sidebar from "./Sidebar"
 const Navbar = () => {
   const { user } = useAuthStore()
   const [open, setOpen] = useState(false)
+  // Usa o nome retornado pela autenticação; se não existir, mostra um fallback.
   const userName = user?.name?.trim() || "Usuário"
 
   return (
@@ -53,8 +54,6 @@ const Navbar = () => {
         open={open}
         setOpen={setOpen}
       />
-
-      {/* BOTÃO MENU */}
     </>
   )
 }

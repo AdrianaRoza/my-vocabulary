@@ -1,8 +1,8 @@
 import { ImSpinner9 } from "react-icons/im";
 
+// Tela simples de bloqueio usada durante operações importantes.
 const LoadingScreen = ({title, content}: {title: string, content:string}) => (
   <div className="w-screen h-screen flex flex-col justify-center items-center">
-    {/* <FaLock className="text-blue-800 mb-4" size={48} /> */}
     <ImSpinner9 
       className="text-blue-800" 
       size={36} 
@@ -11,7 +11,7 @@ const LoadingScreen = ({title, content}: {title: string, content:string}) => (
     <h2 className="mb-3 text-4xl">{title}</h2>
     <p className="text-zinc-600">{content}</p>
     
-    {/* Estilo inline para a animação */}
+    {/* Define a animação do spinner localmente para evitar dependência extra */}
     <style>
       {`
         @keyframes spin {
@@ -21,6 +21,6 @@ const LoadingScreen = ({title, content}: {title: string, content:string}) => (
       `}
     </style>
   </div>
-);
+)
 
 export default LoadingScreen

@@ -4,6 +4,7 @@ import LoadingScreen from "../components/LoadingScreen"
 import kc from "../service/keycloak"
 import useAuthStore from "../store/useAuthStore"
 
+// Configurações de expiração e renovação da sessão.
 const IDLE_TIMEOUT_MINUTES = 15 // tempo de inatividade permitido
 const RENEW_INTERVAL_MS = 30_000 // checagem a cada 30s
 const MIN_TOKEN_VALIDITY = 60 // renovar se faltar menos de 60s
@@ -13,17 +14,18 @@ const ProtectedRoutes = () => {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null)
   const [isIdle, setIsIdle] = useState(false)
 
+  // Evita que o Keycloak seja inicializado mais de uma vez.
   const initialized = useRef(false)
 
-  // ===== Função de logout centralizada =====
+  // Centraliza o logout para reaproveitar a mesma regra em todos os cenários.
   const doLogout = useCallback(() => {
     console.warn("Encerrando sessão...")
     kc.logout({ redirectUri: window.location.origin })
   }, [])
 
-  // ===== Inicialização do Keycloak =====
+  // Inicializa a autenticação e hidrata a store com os dados do usuário.
   useEffect(() => {
-    if (initialized.current) return // evita reinicialização
+    if (initialized.current) return
     initialized.current = true
 
     kc.init({
@@ -52,7 +54,7 @@ const ProtectedRoutes = () => {
 
         setLoading(false)
 
-        // Renovação reativa (caso expire)
+        // Se o token expirar, a aplicação tenta renovar antes de encerrar a sessão.
         kc.onTokenExpired = () => {
           console.log("Token expired, attempting refresh...")
           kc.updateToken(30).catch(() => {
@@ -67,7 +69,7 @@ const ProtectedRoutes = () => {
       })
   }, [doLogout, login, setLoading])
 
-  // ===== Controle de inatividade =====
+  // Monitora a atividade do usuário para derrubar sessões ociosas.
   useEffect(() => {
     let idleTimer: number
 
@@ -95,12 +97,12 @@ const ProtectedRoutes = () => {
     }
   }, [doLogout, isIdle])
 
-  // ===== Renovação proativa do token =====
+  // Renova o token periodicamente enquanto a sessão estiver ativa.
   useEffect(() => {
     if (!authenticated) return
 
     const intervalId = window.setInterval(() => {
-      if (isIdle) return // não renova se usuário estiver inativo
+      if (isIdle) return
       kc.updateToken(MIN_TOKEN_VALIDITY).catch(() => {
         console.error("Token refresh failed, logging out...")
         doLogout()
