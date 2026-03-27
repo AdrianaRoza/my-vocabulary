@@ -10,6 +10,8 @@ interface CardProps {
 
 const Card = ({ user, categoriesCount, wordsCount }: CardProps) => {
   if (!user?.id) return null
+  const resolvedCategoriesCount = categoriesCount ?? user.categoriesCount
+  const resolvedWordsCount = wordsCount ?? user.wordsCount
 
   // Usa a inicial do nome como avatar simples do card.
   const initial = user.name?.trim().charAt(0).toUpperCase() || "U"
@@ -50,7 +52,7 @@ const Card = ({ user, categoriesCount, wordsCount }: CardProps) => {
             Categorias
           </p>
           <p className="mt-1 font-semibold whitespace-nowrap text-[clamp(0.62rem,1.4vw,0.95rem)] leading-none">
-            {categoriesCount ?? "-"}
+            {resolvedCategoriesCount ?? "-"}
           </p>
         </Link>
         <Link
@@ -62,7 +64,7 @@ const Card = ({ user, categoriesCount, wordsCount }: CardProps) => {
             Palavras
           </p>
           <p className="mt-1 font-semibold whitespace-nowrap text-[clamp(0.62rem,1.4vw,0.95rem)] leading-none">
-            {wordsCount ?? "-"}
+            {resolvedWordsCount ?? "-"}
           </p>
         </Link>
       </div>

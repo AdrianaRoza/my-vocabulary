@@ -2,75 +2,53 @@ import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 import Card from "../components/Card"
 import Grid from "../components/Grid"
-import  useAuthStore from "../store/useAuthStore"
-import { getCategoriesByUser } from "../service/categoryApi"
-import { getWordsByCategory } from "../service/wordApi"
+import { getUserCards } from "../service/userApi"
+import type { User } from "../types/user"
 
 export default function Home() {
-  const { user } = useAuthStore()
-  const [categoriesCount, setCategoriesCount] = useState<number | undefined>(undefined)
-  const [wordsCount, setWordsCount] = useState<number | undefined>(undefined)
+  const [users, setUsers] = useState<User[]>([])
 
   useEffect(() => {
     let isMounted = true
 
-    // Carrega os totais do usuário para exibir no card principal da home.
-    const loadUserStats = async () => {
-      if (!user?.id) {
-        if (isMounted) {
-          setCategoriesCount(undefined)
-          setWordsCount(undefined)
-        }
-        return
-      }
-
+    const loadUsers = async () => {
       try {
-        const userId = user.id
-        const categories = await getCategoriesByUser(userId)
-
-        const wordsByCategory = await Promise.all(
-          categories.map((category) =>
-            getWordsByCategory({ userId, categoryId: category.id })
-          )
-        )
-
-        const totalWords = wordsByCategory.reduce(
-          (accumulator, words) => accumulator + words.length,
-          0
-        )
-
         if (isMounted) {
-          setCategoriesCount(categories.length)
-          setWordsCount(totalWords)
+          setUsers(await getUserCards())
         }
       } catch (error) {
-        console.error("Erro ao carregar dados do usuário:", error)
+        console.error("Erro ao carregar os perfis:", error)
         if (isMounted) {
-          setCategoriesCount(undefined)
-          setWordsCount(undefined)
+          setUsers([])
         }
-        toast.error("Não foi possível carregar os dados do perfil.")
+        toast.error("Não foi possível carregar os perfis.")
       }
     }
 
-    void loadUserStats()
+    void loadUsers()
 
     return () => {
       isMounted = false
     }
-  }, [user?.id])
+  }, [])
 
   return (
     <div className="px-3 py-6 sm:p-6 md:p-10">
       <h1 className="text-2xl font-semibold text-gray-800 mb-6 ml-5">Perfis de Usuários</h1>
       <Grid>
-        {/* Hoje a aplicação mostra o usuário autenticado; a estrutura já permite evoluir para múltiplos perfis */}
-        <Card
-          user={user}
-          categoriesCount={categoriesCount}
-          wordsCount={wordsCount}
-        />
+        {users.map((user) => (
+          <Card
+            key={user.id}
+            user={user}
+          />
+        ))}
       </Grid>
+
+      {users.length === 0 && (
+        <div className="mt-8 rounded-xl border border-gray-200 bg-white p-6 text-center text-gray-500">
+          Nenhum perfil encontrado.
+        </div>
+      )}
     </div>
   )
 }

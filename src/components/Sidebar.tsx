@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { FaArrowCircleLeft, FaArrowCircleRight, FaUserTie } from "react-icons/fa"
 import { FiFileText, FiLogOut } from "react-icons/fi"
 import { GrDocumentConfig } from "react-icons/gr"
@@ -17,9 +17,11 @@ type SidebarProps = {
 
 export default function Sidebar({ open, setOpen }: SidebarProps) {
   const navigate = useNavigate()
+  const { userId: routeUserId } = useParams()
   const [categories, setCategories] = useState<Category[]>([])
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
   const { user, logout } = useAuthStore()
+  const activeUserId = routeUserId || user?.id
 
   const goHistory = (value: number) => {
     setOpen(false)
@@ -37,13 +39,13 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
 
     // Carrega as categorias dinamicamente para montar os submenus do sidebar.
     const loadCategories = async () => {
-      if (!user?.id) {
+      if (!activeUserId) {
         if (isMounted) setCategories([])
         return
       }
 
       try {
-        const data = await getCategoriesByUser(user.id)
+        const data = await getCategoriesByUser(activeUserId)
         if (isMounted) setCategories(data)
       } catch (error) {
         console.error("Erro ao carregar categorias do menu:", error)
@@ -58,7 +60,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
     return () => {
       isMounted = false
     }
-  }, [open, user?.id])
+  }, [activeUserId, open])
 
   return (
     <div
@@ -81,7 +83,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
         <li
           onClick={() => {
             setOpen(false)
-            navigate(`/profile/${user?.id}`)
+            navigate(`/profile/${activeUserId}`)
           }}
           className="flex cursor-pointer items-center gap-2 hover:text-blue-600"
         >
@@ -92,7 +94,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
         <li
           onClick={() => {
             setOpen(false)
-            navigate(`/profile/${user?.id}/texts`)
+            navigate(`/profile/${activeUserId}/texts`)
           }}
           className="flex cursor-pointer items-center gap-2 hover:text-blue-600"
         >
@@ -120,7 +122,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
               <li
                 onClick={() => {
                   setOpen(false)
-                  navigate(`/profile/${user?.id}/categories`)
+                  navigate(`/profile/${activeUserId}/categories`)
                 }}
                 className="cursor-pointer text-sm hover:text-blue-300"
               >
@@ -133,7 +135,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
                   key={category.id}
                   onClick={() => {
                     setOpen(false)
-                    navigate(`/profile/${user?.id}/category/${category.id}`)
+                    navigate(`/profile/${activeUserId}/category/${category.id}`)
                   }}
                   className="cursor-pointer text-sm hover:text-blue-300"
                 >

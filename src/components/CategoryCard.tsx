@@ -1,7 +1,6 @@
 import { CiEdit } from "react-icons/ci"
 import { MdDeleteOutline } from "react-icons/md"
-import { Link } from "react-router-dom"
-import useAuthStore from "../store/useAuthStore"
+import { Link, useParams } from "react-router-dom"
 import type { Category } from "../types/category"
 
 interface Props {
@@ -11,12 +10,12 @@ interface Props {
 }
 
 const CategoryCard = ({ category, onEdit, onDelete }: Props) => {
-  const { user } = useAuthStore()
+  const { userId } = useParams()
 
   return (
     <div className="relative w-full aspect-5/8">
       <Link
-        to={`/profile/${user?.id}/category/${category.id}`}
+        to={`/profile/${userId}/category/${category.id}`}
         className="rounded-2xl w-full h-full bg-linear-to-l from-gray-900 to-blue-800 text-white shadow-lg p-4 flex justify-center items-center hover:scale-105 hover:shadow-2xl transition"
       >
         <p className="font-semibold leading-tight text-center whitespace-nowrap text-[clamp(0.78rem,2.5vw,1.25rem)]">

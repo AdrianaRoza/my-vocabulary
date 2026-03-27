@@ -1,14 +1,45 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useParams } from "react-router-dom"
 import { Menu } from "lucide-react"
 import useAuthStore from "../store/useAuthStore"
 import { IoCloseSharp } from "react-icons/io5"
 import Sidebar from "./Sidebar"
+import { getUserById } from "../service/userApi"
 
 const Navbar = () => {
+  const { userId } = useParams()
   const { user } = useAuthStore()
   const [open, setOpen] = useState(false)
-  // Usa o nome retornado pela autenticação; se não existir, mostra um fallback.
-  const userName = user?.name?.trim() || "Usuário"
+  const [selectedUserName, setSelectedUserName] = useState("")
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadSelectedUserName = async () => {
+      if (!userId) {
+        if (isMounted) setSelectedUserName("")
+        return
+      }
+
+      try {
+        const selectedUser = await getUserById(userId)
+        if (isMounted) {
+          setSelectedUserName(selectedUser.name?.trim() || "")
+        }
+      } catch (error) {
+        console.error("Erro ao carregar o usuário selecionado na navbar:", error)
+        if (isMounted) setSelectedUserName("")
+      }
+    }
+
+    void loadSelectedUserName()
+
+    return () => {
+      isMounted = false
+    }
+  }, [userId])
+
+  const userName = selectedUserName || user?.name?.trim() || "Usuário"
 
   return (
     <>
