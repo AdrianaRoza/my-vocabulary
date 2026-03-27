@@ -31,7 +31,7 @@ const CategoryCard = ({ category, onEdit, onDelete }: Props) => {
             event.stopPropagation()
             void onEdit(category)
           }}
-          className="rounded-full bg-white/90 p-2 text-gray-900 shadow hover:bg-white"
+          className="p-1 text-white/90 hover:text-white transition"
           aria-label={`Editar categoria ${category.name}`}
         >
           <CiEdit />
@@ -43,7 +43,7 @@ const CategoryCard = ({ category, onEdit, onDelete }: Props) => {
             event.stopPropagation()
             void onDelete(category)
           }}
-          className="rounded-full bg-white/90 p-2 text-gray-900 shadow hover:bg-white"
+          className="p-1 text-white/90 hover:text-white transition"
           aria-label={`Excluir categoria ${category.name}`}
         >
           <MdDeleteOutline />

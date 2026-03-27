@@ -9,10 +9,10 @@ import type { Word } from "../types/word"
 
 interface CardProps {
   word: Word
-  userId: string
-  categoryId: string
-  onWordUpdated: (wordId: string, english: string) => Promise<void>
-  onWordDeleted: (wordId: string) => Promise<void>
+  userId?: string
+  categoryId?: string
+  onWordUpdated?: (wordId: string, english: string) => Promise<void>
+  onWordDeleted?: (wordId: string) => Promise<void>
 }
 
 const CardFlip = ({ word, userId, categoryId, onWordUpdated, onWordDeleted }: CardProps) => {
@@ -42,7 +42,7 @@ const CardFlip = ({ word, userId, categoryId, onWordUpdated, onWordDeleted }: Ca
   const handleEdit = async (e: React.MouseEvent) => {
     e.stopPropagation()
 
-    if (!userId || !categoryId) {
+    if (!userId || !categoryId || !onWordUpdated) {
       toast.error("Usuário ou categoria inválidos.")
       return
     }
@@ -63,7 +63,7 @@ const CardFlip = ({ word, userId, categoryId, onWordUpdated, onWordDeleted }: Ca
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation()
 
-    if (!userId) {
+    if (!userId || !onWordDeleted) {
       toast.error("Usuário inválido.")
       return
     }
@@ -153,7 +153,7 @@ const CardFlip = ({ word, userId, categoryId, onWordUpdated, onWordDeleted }: Ca
           <div className="absolute bottom-0 left-0 w-full flex justify-around items-center p-3">
             <button
               onClick={handleEdit}
-              disabled={isSubmitting}
+              disabled={isSubmitting || !onWordUpdated || !categoryId || !userId}
               className="px-4 py-2 hover:bg-gray-700 text-sm rounded disabled:opacity-50"
             >
               <CiEdit />
@@ -161,7 +161,7 @@ const CardFlip = ({ word, userId, categoryId, onWordUpdated, onWordDeleted }: Ca
 
             <button
               onClick={handleDelete}
-              disabled={isSubmitting}
+              disabled={isSubmitting || !onWordDeleted || !userId}
               className="px-4 py-2 hover:bg-gray-700 text-sm rounded disabled:opacity-50"
             >
               <MdDeleteOutline />

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { FileJson2, Files, Layers3, PlusCircle } from "lucide-react"
 import { toast } from "react-toastify"
 import { useParams } from "react-router-dom"
 import CardFlip from "../components/CardFlip"
@@ -101,6 +102,15 @@ const Category = () => {
   const [importJsonText, setImportJsonText] = useState("")
   const [importMode, setImportMode] = useState<ImportMode>("skip")
   const [importFile, setImportFile] = useState<File | null>(null)
+  const hasWords = words.length > 0
+
+  const pageSummary = useMemo(() => {
+    if (!hasWords) {
+      return "Adicione palavras manualmente ou importe um conjunto pronto para preencher esta categoria."
+    }
+
+    return `${words.length} palavra${words.length > 1 ? "s" : ""} cadastrada${words.length > 1 ? "s" : ""} dentro da categoria ${categoryTitle}.`
+  }, [categoryTitle, hasWords, words.length])
 
   const importAiPrompt = `Generate a valid JSON payload for a vocabulary import API.
 
@@ -333,9 +343,7 @@ Rules:
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4">
-      <h1 className="text-2xl font-semibold text-gray-800 mb-4">{categoryTitle}</h1>
-
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-10 pt-6">
       {isLoading && (
         <LoadingScreen
           title="Quase lá..."
@@ -343,28 +351,63 @@ Rules:
         />
       )}
 
-      <div className="flex flex-wrap gap-3 mb-4">
-        <button
-          onClick={() => setModalType("create")}
-          className="bg-linear-to-l from-gray-900 to-blue-800 text-white px-4 py-2 rounded"
-        >
-          + Adicionar Palavra
-        </button>
+      <section className="overflow-hidden rounded-[2rem] bg-linear-to-br from-slate-950 via-slate-900 to-blue-900 text-white shadow-xl">
+        <div className="grid gap-6 px-6 py-8 md:grid-cols-[1.35fr_0.95fr] md:px-8">
+          <div className="space-y-4">
+            <p className="text-sm uppercase tracking-[0.28em] text-blue-200">Category</p>
+            <h1 className="max-w-2xl text-3xl font-semibold leading-tight md:text-4xl">{categoryTitle}</h1>
+            <p className="max-w-2xl text-sm leading-6 text-slate-200 md:text-base">
+              {pageSummary}
+            </p>
+          </div>
 
-        <button
-          onClick={() => setModalType("importJson")}
-          className="bg-white border border-gray-300 text-gray-800 px-4 py-2 rounded"
-        >
-          Importar JSON
-        </button>
+          <div className="grid gap-3 self-start rounded-[1.75rem] bg-white/8 p-4 backdrop-blur-sm">
+            <button
+              type="button"
+              onClick={() => setModalType("create")}
+              className="flex items-center justify-between rounded-2xl bg-white px-4 py-3 text-left text-slate-900 transition hover:scale-[1.01]"
+            >
+              <span>
+                <span className="block text-sm font-semibold">Adicionar palavra</span>
+                <span className="block text-xs text-slate-500">Inclua um novo termo nesta categoria</span>
+              </span>
+              <PlusCircle className="h-5 w-5 text-blue-700" />
+            </button>
 
-        <button
-          onClick={() => setModalType("importFile")}
-          className="bg-white border border-gray-300 text-gray-800 px-4 py-2 rounded"
-        >
-          Importar Arquivo
-        </button>
-      </div>
+            <button
+              type="button"
+              onClick={() => setModalType("importJson")}
+              className="flex items-center justify-between rounded-2xl border border-white/15 bg-slate-950/30 px-4 py-3 text-left transition hover:border-white/25"
+            >
+              <span>
+                <span className="block text-sm font-semibold text-white">Importar JSON</span>
+                <span className="block text-xs text-slate-300">Cole uma estrutura pronta para importar</span>
+              </span>
+              <FileJson2 className="h-5 w-5 text-blue-200" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setModalType("importFile")}
+              className="flex items-center justify-between rounded-2xl border border-white/15 bg-slate-950/30 px-4 py-3 text-left transition hover:border-white/25"
+            >
+              <span>
+                <span className="block text-sm font-semibold text-white">Importar arquivo</span>
+                <span className="block text-xs text-slate-300">Envie um arquivo `.json`, `.md` ou `.markdown`</span>
+              </span>
+              <Files className="h-5 w-5 text-blue-200" />
+            </button>
+
+            <div className="flex items-center justify-between rounded-2xl border border-white/15 bg-slate-950/30 px-4 py-3">
+              <span>
+                <span className="block text-xs uppercase tracking-[0.22em] text-blue-200">Total atual</span>
+                <span className="block text-lg font-semibold text-white">{words.length}</span>
+              </span>
+              <Layers3 className="h-5 w-5 text-blue-200" />
+            </div>
+          </div>
+        </div>
+      </section>
 
       <Grid>
         {words.map((word) => (

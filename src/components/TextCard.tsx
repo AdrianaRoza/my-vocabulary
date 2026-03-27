@@ -1,5 +1,5 @@
-import { Eye, EyeOff, Pencil, Trash2, Volume2 } from "lucide-react"
-import { useMemo, useState } from "react"
+import { Eye, EyeOff, Pause, Pencil, Trash2, Volume2 } from "lucide-react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import type { TextEntry } from "../types/text"
 
 type TextCardProps = {
@@ -9,6 +9,10 @@ type TextCardProps = {
 }
 
 const MAX_TITLE_LENGTH = 42
+
+const splitTextIntoTokens = (content: string) => {
+  return content.split(/(\s+)/).filter((token) => token.length > 0)
+}
 
 const buildCardTitle = (englishText: string) => {
   const normalized = englishText.replace(/\s+/g, " ").trim()
@@ -26,7 +30,23 @@ const buildCardTitle = (englishText: string) => {
 
 const TextCard = ({ text, onDelete, onEdit }: TextCardProps) => {
   const [isTranslationVisible, setIsTranslationVisible] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentWordIndex, setCurrentWordIndex] = useState<number | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
   const cardTitle = useMemo(() => buildCardTitle(text.english), [text.english])
+  const englishTokens = useMemo(() => splitTextIntoTokens(text.english), [text.english])
+  const readableTokens = useMemo(
+    () => englishTokens.filter((token) => !/^\s+$/.test(token)),
+    [englishTokens]
+  )
+
+  // Limpa o audio atual ao trocar de texto ou desmontar o card.
+  useEffect(() => {
+    return () => {
+      audioRef.current?.pause()
+      audioRef.current = null
+    }
+  }, [])
 
   const handlePlayAudio = async () => {
     if (!text.audioUrl) {
@@ -34,8 +54,46 @@ const TextCard = ({ text, onDelete, onEdit }: TextCardProps) => {
     }
 
     try {
-      const audio = new Audio(text.audioUrl)
-      await audio.play()
+      // Se o mesmo audio estiver tocando, o clique atua como pausa.
+      if (audioRef.current && !audioRef.current.paused) {
+        audioRef.current.pause()
+        setIsPlaying(false)
+        return
+      }
+
+      // Recria a instância quando o áudio muda ou ainda não existe.
+      if (!audioRef.current || audioRef.current.src !== text.audioUrl) {
+        audioRef.current?.pause()
+        audioRef.current = new Audio(text.audioUrl)
+
+        audioRef.current.ontimeupdate = () => {
+          if (!audioRef.current || !audioRef.current.duration || readableTokens.length === 0) {
+            return
+          }
+
+          const progress = audioRef.current.currentTime / audioRef.current.duration
+          const nextIndex = Math.min(
+            readableTokens.length - 1,
+            Math.floor(progress * readableTokens.length)
+          )
+
+          setCurrentWordIndex(nextIndex)
+        }
+
+        audioRef.current.onended = () => {
+          setIsPlaying(false)
+          setCurrentWordIndex(null)
+        }
+        audioRef.current.onpause = () => {
+          setIsPlaying(false)
+        }
+      }
+
+      await audioRef.current.play()
+      setIsPlaying(true)
+      if (currentWordIndex === null) {
+        setCurrentWordIndex(0)
+      }
     } catch (error) {
       console.error("Erro ao reproduzir audio do texto:", error)
     }
@@ -81,11 +139,39 @@ const TextCard = ({ text, onDelete, onEdit }: TextCardProps) => {
               disabled={!text.audioUrl}
               className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <Volume2 size={16} />
-              Audio
+              {isPlaying ? <Pause size={16} /> : <Volume2 size={16} />}
+              {isPlaying ? "Pausar" : "Audio"}
             </button>
           </div>
-          <p className="whitespace-pre-line leading-7 text-slate-900">{text.english}</p>
+          <p className="leading-7 text-slate-900">
+            {englishTokens.map((token, index) => {
+              if (/^\s+$/.test(token)) {
+                return <span key={`space-${index}`}>{token}</span>
+              }
+
+              const wordPosition = englishTokens
+                .slice(0, index + 1)
+                .filter((part) => !/^\s+$/.test(part)).length - 1
+
+              const isCurrentWord = currentWordIndex === wordPosition
+              const isReadWord = currentWordIndex !== null && wordPosition < currentWordIndex
+
+              return (
+                <span
+                  key={`word-${index}`}
+                  className={
+                    isCurrentWord
+                      ? "rounded-md bg-blue-600 px-1 py-0.5 text-white"
+                      : isReadWord
+                        ? "text-blue-700"
+                        : ""
+                  }
+                >
+                  {token}
+                </span>
+              )
+            })}
+          </p>
         </section>
 
         <section className="space-y-3 rounded-2xl bg-slate-50 p-4">

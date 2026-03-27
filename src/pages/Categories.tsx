@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { FolderPlus, Layers3 } from "lucide-react"
 import { toast } from "react-toastify"
 import { useParams } from "react-router-dom"
 import CategoryCard from "../components/CategoryCard"
@@ -15,6 +16,15 @@ const Categories = () => {
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState("Estamos criando sua nova categoria")
+  const hasCategories = categories.length > 0
+
+  const pageSummary = useMemo(() => {
+    if (!hasCategories) {
+      return "Crie categorias para organizar as palavras por contexto e montar uma trilha de estudo mais clara."
+    }
+
+    return `${categories.length} categoria${categories.length > 1 ? "s" : ""} disponivel${categories.length > 1 ? "eis" : ""} para separar seu vocabulario por tema.`
+  }, [categories.length, hasCategories])
 
   // Recarrega a lista de categorias sempre que uma nova categoria for criada.
   const fetchCategories = async () => {
@@ -123,7 +133,7 @@ const Categories = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-10 pt-6">
       {isLoading && (
         <LoadingScreen
           title="Quase lá..."
@@ -131,13 +141,41 @@ const Categories = () => {
         />
       )}
 
-      {/* Botão de ação principal da página */}
-      <button
-        onClick={() => setShowForm(true)}
-        className="bg-linear-to-l from-gray-900 to-blue-800 text-white px-4 py-2 rounded ml-3"
-      >
-        + Adicionar Categoria
-      </button>
+      <section className="overflow-hidden rounded-[2rem] bg-linear-to-br from-slate-950 via-slate-900 to-blue-900 text-white shadow-xl">
+        <div className="grid gap-6 px-6 py-8 md:grid-cols-[1.35fr_0.95fr] md:px-8">
+          <div className="space-y-4">
+            <p className="text-sm uppercase tracking-[0.28em] text-blue-200">Categories</p>
+            <h1 className="max-w-2xl text-3xl font-semibold leading-tight md:text-4xl">
+              Organize seu vocabulario por tema antes de estudar.
+            </h1>
+            <p className="max-w-2xl text-sm leading-6 text-slate-200 md:text-base">
+              {pageSummary}
+            </p>
+          </div>
+
+          <div className="grid gap-3 self-start rounded-[1.75rem] bg-white/8 p-4 backdrop-blur-sm">
+            <button
+              type="button"
+              onClick={() => setShowForm(true)}
+              className="flex items-center justify-between rounded-2xl bg-white px-4 py-3 text-left text-slate-900 transition hover:scale-[1.01]"
+            >
+              <span>
+                <span className="block text-sm font-semibold">Nova categoria</span>
+                <span className="block text-xs text-slate-500">Crie um novo grupo para suas palavras</span>
+              </span>
+              <FolderPlus className="h-5 w-5 text-blue-700" />
+            </button>
+
+            <div className="flex items-center justify-between rounded-2xl border border-white/15 bg-slate-950/30 px-4 py-3">
+              <span>
+                <span className="block text-xs uppercase tracking-[0.22em] text-blue-200">Total atual</span>
+                <span className="block text-lg font-semibold text-white">{categories.length}</span>
+              </span>
+              <Layers3 className="h-5 w-5 text-blue-200" />
+            </div>
+          </div>
+        </div>
+      </section>
 
       <Grid>
         {categories.map((category) => (
