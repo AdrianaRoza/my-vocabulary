@@ -4,6 +4,7 @@ import Category from "./pages/Category"
 import Layout from "./pages/Layout"
 import Profile from "./pages/Profile"
 import Categories from "./pages/Categories"
+import Texts from "./pages/Texts"
 import ProtectedRoutes from "./routes/ProtectedRoutes"
 
 function App() {
@@ -14,9 +15,9 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="/profile/:userId" element={<Profile />} />
-            {/* descutir a melhor pratica */}
             <Route path="/profile/:userId/categories/" element={<Categories />} />
             <Route path="/profile/:userId/category/:categoryId" element={<Category />} />
+            <Route path="/profile/:userId/texts" element={<Texts />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

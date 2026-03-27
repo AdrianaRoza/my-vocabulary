@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { FaArrowCircleRight } from "react-icons/fa"
-import { FaArrowCircleLeft } from "react-icons/fa"
-import { RiHomeHeartFill } from "react-icons/ri"
-import { FaUserTie } from "react-icons/fa"
+import { FaArrowCircleLeft, FaArrowCircleRight, FaUserTie } from "react-icons/fa"
+import { FiFileText, FiLogOut } from "react-icons/fi"
 import { GrDocumentConfig } from "react-icons/gr"
-import { FiLogOut } from "react-icons/fi"
+import { RiHomeHeartFill } from "react-icons/ri"
 import useAuthStore from "../store/useAuthStore"
+import { getCategoriesByUser } from "../service/categoryApi"
 import kc from "../service/keycloak"
 import type { Category } from "../types/category"
-import { getCategoriesByUser } from "../service/categoryApi"
 
 type SidebarProps = {
   open: boolean
@@ -20,13 +18,12 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
   const navigate = useNavigate()
   const [categories, setCategories] = useState<Category[]>([])
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
+  const { user, logout } = useAuthStore()
 
   const goHistory = (value: number) => {
     setOpen(false)
     navigate(value)
   }
-
-  const { user, logout } = useAuthStore()
 
   const handleLogout = () => {
     setOpen(false)
@@ -63,39 +60,42 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
 
   return (
     <div
-      className={`fixed top-0 left-0 h-full bg-linear-to-b from-gray-900 to-blue-800 text-white w-72 max-w-[85vw] transform 
-      ${open ? "translate-x-0" : "-translate-x-full"} 
-      transition-transform duration-300 z-40 flex flex-col`}
+      className={`fixed top-0 left-0 h-full bg-linear-to-b from-gray-900 to-blue-800 text-white w-72 max-w-[85vw] transform ${open ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 z-40 flex flex-col`}
     >
+      <div className="mt-10 p-6 text-xl font-bold">Menu</div>
 
-      <div className="p-6 mt-10 text-xl font-bold">
-        Menu
-      </div>
-
-      
-
-      <ul className="space-y-4 p-6 flex-1">
-
-        <li 
+      <ul className="flex-1 space-y-4 p-6">
+        <li
           onClick={() => {
             setOpen(false)
             navigate("/")
           }}
-          className="flex items-center gap-2 hover:text-blue-600 cursor-pointer"
+          className="flex cursor-pointer items-center gap-2 hover:text-blue-600"
         >
           <RiHomeHeartFill />
           Home
         </li>
 
-        <li 
+        <li
           onClick={() => {
             setOpen(false)
             navigate(`/profile/${user?.id}`)
           }}
-          className="flex items-center gap-2 hover:text-blue-600 cursor-pointer"
+          className="flex cursor-pointer items-center gap-2 hover:text-blue-600"
         >
           <FaUserTie />
           Perfil
+        </li>
+
+        <li
+          onClick={() => {
+            setOpen(false)
+            navigate(`/profile/${user?.id}/texts`)
+          }}
+          className="flex cursor-pointer items-center gap-2 hover:text-blue-600"
+        >
+          <FiFileText />
+          Textos
         </li>
 
         <li>
@@ -103,7 +103,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
             onClick={() => {
               setIsCategoriesOpen((prev) => !prev)
             }}
-            className="w-full flex items-center justify-between gap-2 hover:text-blue-600 cursor-pointer"
+            className="flex w-full cursor-pointer items-center justify-between gap-2 hover:text-blue-600"
           >
             <span className="flex items-center gap-2">
               <GrDocumentConfig />
@@ -119,7 +119,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
                   setOpen(false)
                   navigate(`/profile/${user?.id}/categories`)
                 }}
-                className="text-sm hover:text-blue-300 cursor-pointer"
+                className="cursor-pointer text-sm hover:text-blue-300"
               >
                 Ver todas
               </li>
@@ -131,7 +131,7 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
                     setOpen(false)
                     navigate(`/profile/${user?.id}/category/${category.id}`)
                   }}
-                  className="text-sm hover:text-blue-300 cursor-pointer"
+                  className="cursor-pointer text-sm hover:text-blue-300"
                 >
                   {category.name}
                 </li>
@@ -140,31 +140,21 @@ export default function Sidebar({ open, setOpen }: SidebarProps) {
           )}
         </li>
 
-        <div 
-          className="flex justify-evenly mt-10"
-          >
-            <FaArrowCircleLeft 
-              className="cursor-pointer hover:text-blue-600"
-              onClick={() => goHistory(-1)}
-            />
-            <FaArrowCircleRight
-              className="cursor-pointer hover:text-blue-400"
-              onClick={() => goHistory(1)}
-            />
+        <div className="mt-10 flex justify-evenly">
+          <FaArrowCircleLeft className="cursor-pointer hover:text-blue-600" onClick={() => goHistory(-1)} />
+          <FaArrowCircleRight className="cursor-pointer hover:text-blue-400" onClick={() => goHistory(1)} />
         </div>
-
       </ul>
 
-      <div className="p-4 border-t border-white/20">
+      <div className="border-t border-white/20 p-4">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 transition rounded-lg px-4 py-2"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-white/10 px-4 py-2 transition hover:bg-white/20"
         >
           <FiLogOut />
           Sair
         </button>
       </div>
-
     </div>
   )
 }

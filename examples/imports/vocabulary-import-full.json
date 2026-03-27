@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "items": [
+    {
+      "english": "Notebook",
+      "portuguese": "Caderno",
+      "sentences": [
+        {
+          "english": "This notebook is blue.",
+          "portuguese": "Este caderno e azul."
+        },
+        {
+          "english": "I bought a new notebook.",
+          "portuguese": "Eu comprei um caderno novo."
+        }
+      ]
+    },
+    {
+      "english": "Pencil",
+      "portuguese": "Lapis",
+      "sentences": [
+        {
+          "english": "The pencil is on the desk.",
+          "portuguese": "O lapis esta na mesa."
+        }
+      ]
+    }
+  ]
+}

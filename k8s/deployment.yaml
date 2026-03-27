@@ -18,6 +18,6 @@ spec:
       - name: registry-secret
       containers:
         - name: vocabulary-app
-          image: registry.nst.art.br/vocabulary-app:0.0.3
+          image: registry.nst.art.br/vocabulary-app:0.0.5
           ports:
             - containerPort: 80
