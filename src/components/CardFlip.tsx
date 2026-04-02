@@ -26,17 +26,30 @@ const CardFlip = ({ word, userId, categoryId, onWordUpdated, onWordDeleted }: Ca
     setEditedWord(word)
   }, [word])
 
-  const playAudio = (e: React.MouseEvent<HTMLElement>, url?: string | null) => {
+  const playAudio = (e: React.MouseEvent<HTMLElement>, url?: string | null, fallbackText?: string) => {
     e.stopPropagation()
 
-    if (!url) {
+    if (url) {
+      void new Audio(url).play().catch(() => {
+        toast.error("Não foi possível reproduzir o áudio.")
+      })
+      return
+    }
+
+    if (!fallbackText?.trim() || typeof window === "undefined" || !("speechSynthesis" in window)) {
       toast.warning("Audio indisponível para este item.")
       return
     }
 
-    void new Audio(url).play().catch(() => {
+    try {
+      window.speechSynthesis.cancel()
+      const utterance = new SpeechSynthesisUtterance(fallbackText)
+      utterance.lang = "en-US"
+      window.speechSynthesis.speak(utterance)
+    } catch (error) {
+      console.error("Erro ao sintetizar áudio no navegador:", error)
       toast.error("Não foi possível reproduzir o áudio.")
-    })
+    }
   }
 
   const handleEdit = (e: React.MouseEvent) => {
@@ -92,7 +105,7 @@ const CardFlip = ({ word, userId, categoryId, onWordUpdated, onWordDeleted }: Ca
 
           <div className="absolute bottom-0 left-0 w-full p-2 flex justify-around bg-black/20">
             <button
-              onClick={(e) => playAudio(e, editedWord.audioUrl)}
+              onClick={(e) => playAudio(e, editedWord.audioUrl, editedWord.english)}
               className="px-4 py-2 hover:bg-gray-500 text-sm rounded disabled:opacity-50"
               disabled={isSubmitting}
             >
@@ -121,7 +134,7 @@ const CardFlip = ({ word, userId, categoryId, onWordUpdated, onWordDeleted }: Ca
               editedWord.phrases.map((phrase: Phrase) => (
                 <div
                   key={phrase.id}
-                  onClick={(e) => playAudio(e, phrase.audioUrl)}
+                  onClick={(e) => playAudio(e, phrase.audioUrl, phrase.text)}
                   className="text-[clamp(0.62rem,1.7vw,0.72rem)] my-1.5 hover:cursor-pointer break-words text-center max-w-[95%] lg:max-w-[88%] leading-tight"
                 >
                   <div>{showTranslation ? phrase.translation : phrase.text}</div>
