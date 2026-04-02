@@ -35,7 +35,7 @@ const Card = ({ user, categoriesCount, wordsCount }: CardProps) => {
         </div>
 
         <div className="min-w-0">
-          <p className="font-semibold leading-tight whitespace-nowrap text-[clamp(0.42rem,1.45vw,0.95rem)]">
+          <p className="max-w-[95%] font-semibold leading-tight break-normal text-[clamp(0.42rem,1.45vw,0.95rem)]">
             {user.name}
           </p>
         </div>

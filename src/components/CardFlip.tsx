@@ -11,8 +11,8 @@ interface CardProps {
   word: Word
   userId?: string
   categoryId?: string
-  onWordUpdated?: (wordId: string, english: string) => Promise<void>
-  onWordDeleted?: (wordId: string) => Promise<void>
+  onWordUpdated?: (word: Word) => void
+  onWordDeleted?: (word: Word) => void
 }
 
 const CardFlip = ({ word, userId, categoryId, onWordUpdated, onWordDeleted }: CardProps) => {
@@ -20,7 +20,7 @@ const CardFlip = ({ word, userId, categoryId, onWordUpdated, onWordDeleted }: Ca
   const [showTranslation, setShowTranslation] = useState(false)
   // Estado local para suportar a edição provisória no frontend.
   const [editedWord, setEditedWord] = useState(word)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting] = useState(false)
 
   useEffect(() => {
     setEditedWord(word)
@@ -39,7 +39,7 @@ const CardFlip = ({ word, userId, categoryId, onWordUpdated, onWordDeleted }: Ca
     })
   }
 
-  const handleEdit = async (e: React.MouseEvent) => {
+  const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation()
 
     if (!userId || !categoryId || !onWordUpdated) {
@@ -47,20 +47,10 @@ const CardFlip = ({ word, userId, categoryId, onWordUpdated, onWordDeleted }: Ca
       return
     }
 
-    const newEnglish = window.prompt("Editar inglês:", editedWord.english)?.trim()
-
-    if (!newEnglish) return
-    if (newEnglish === editedWord.english) return
-
-    setIsSubmitting(true)
-    try {
-      await onWordUpdated(editedWord.id, newEnglish)
-    } finally {
-      setIsSubmitting(false)
-    }
+    onWordUpdated(editedWord)
   }
 
-  const handleDelete = async (e: React.MouseEvent) => {
+  const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation()
 
     if (!userId || !onWordDeleted) {
@@ -68,15 +58,7 @@ const CardFlip = ({ word, userId, categoryId, onWordUpdated, onWordDeleted }: Ca
       return
     }
 
-    const confirmDelete = window.confirm(`Deseja excluir a palavra "${editedWord.english}"?`)
-    if (!confirmDelete) return
-
-    setIsSubmitting(true)
-    try {
-      await onWordDeleted(editedWord.id)
-    } finally {
-      setIsSubmitting(false)
-    }
+    onWordDeleted(editedWord)
   }
 
   // Alterna entre original e tradução no verso do card.

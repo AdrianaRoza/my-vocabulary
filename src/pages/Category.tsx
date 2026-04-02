@@ -19,7 +19,7 @@ import {
 } from "../service/wordApi"
 import type { Word } from "../types/word"
 
-type ModalType = "create" | "importJson" | "importFile" | null
+type ModalType = "create" | "edit" | "delete" | "importJson" | "importFile" | null
 
 type ImportPayloadLike = {
   items?: WordImportItem[]
@@ -96,13 +96,34 @@ const Category = () => {
   const [words, setWords] = useState<Word[]>([])
   const [categoryTitle, setCategoryTitle] = useState("Categoria")
   const [newWord, setNewWord] = useState("")
+  const [editingWord, setEditingWord] = useState<Word | null>(null)
+  const [editingWordName, setEditingWordName] = useState("")
+  const [pendingDeleteWord, setPendingDeleteWord] = useState<Word | null>(null)
   const [modalType, setModalType] = useState<ModalType>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState("Estamos processando sua solicitação")
+  const [successMessage, setSuccessMessage] = useState("")
+  const [errorMessage, setErrorMessage] = useState("")
   const [importJsonText, setImportJsonText] = useState("")
   const [importMode, setImportMode] = useState<ImportMode>("skip")
   const [importFile, setImportFile] = useState<File | null>(null)
   const hasWords = words.length > 0
+
+  const showTimedScreen = (type: "success" | "error", message: string) => {
+    if (type === "success") {
+      setSuccessMessage(message)
+    } else {
+      setErrorMessage(message)
+    }
+
+    window.setTimeout(() => {
+      if (type === "success") {
+        setSuccessMessage("")
+      } else {
+        setErrorMessage("")
+      }
+    }, 1600)
+  }
 
   const pageSummary = useMemo(() => {
     if (!hasWords) {
@@ -192,75 +213,101 @@ Rules:
       return
     }
 
-    setLoadingMessage("Estamos criando sua nova palavra")
-    setIsLoading(true)
-
     try {
       setModalType(null)
+      setLoadingMessage("Estamos criando sua nova palavra")
+      setIsLoading(true)
+
       const response = await createWord({
         english: newWord.trim(),
         userId,
         categoryId,
       })
 
-      toast.success(response.detail ?? "Palavra criada com sucesso.")
       setNewWord("")
       await fetchWords()
+      showTimedScreen("success", response.detail ?? "Sua palavra foi criada com sucesso.")
     } catch (error) {
-      toast.error("Não foi possível criar a palavra.")
       console.error("Erro ao criar palavra:", error)
+      showTimedScreen("error", "Não foi possível criar a palavra.")
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleWordUpdated = async (wordId: string, english: string) => {
-    if (!userId || !categoryId) {
-      toast.error("Categoria ou usuário inválido.")
+  const handleWordUpdated = (word: Word) => {
+    setEditingWord(word)
+    setEditingWordName(word.english)
+    setModalType("edit")
+  }
+
+  const handleWordDeleted = (word: Word) => {
+    setPendingDeleteWord(word)
+    setModalType("delete")
+  }
+
+  const confirmWordUpdated = async () => {
+    if (!userId || !categoryId || !editingWord) {
+      toast.error("Categoria ou usuário inválidos.")
       return
     }
 
+    const nextEnglish = editingWordName.trim()
+    if (!nextEnglish || nextEnglish === editingWord.english) {
+      setEditingWord(null)
+      setEditingWordName("")
+      setModalType(null)
+      return
+    }
+
+    const word = editingWord
+    setEditingWord(null)
+    setEditingWordName("")
+    setModalType(null)
     setLoadingMessage("Estamos atualizando sua palavra")
     setIsLoading(true)
 
     try {
       const response = await updateWord({
-        wordId,
-        english,
+        wordId: word.id,
+        english: nextEnglish,
         userId,
         categoryId,
       })
 
-      toast.success(response.detail ?? "Palavra atualizada com sucesso.")
       await fetchWords()
+      showTimedScreen("success", response.detail ?? "Sua palavra foi atualizada com sucesso.")
     } catch (error) {
-      toast.error("Não foi possível atualizar a palavra.")
       console.error("Erro ao atualizar palavra:", error)
+      showTimedScreen("error", "Não foi possível atualizar a palavra.")
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleWordDeleted = async (wordId: string) => {
-    if (!userId) {
+  const confirmWordDeleted = async () => {
+    if (!userId || !pendingDeleteWord) {
       toast.error("Usuário inválido.")
       return
     }
 
+    const word = pendingDeleteWord
+    setPendingDeleteWord(null)
+    setModalType(null)
     setLoadingMessage("Estamos removendo sua palavra")
     setIsLoading(true)
 
     try {
       const response = await deleteWord({
-        wordId,
+        wordId: word.id,
         userId,
       })
 
-      toast.success(response.detail ?? "Palavra removida com sucesso.")
       await fetchWords()
+      showTimedScreen("success", response.detail ?? "Sua palavra foi removida com sucesso.")
     } catch (error) {
-      toast.error("Não foi possível excluir a palavra.")
       console.error("Erro ao excluir palavra:", error)
+      showTimedScreen("error", "Não foi possível excluir a palavra.")
     } finally {
       setIsLoading(false)
     }
@@ -290,7 +337,7 @@ Rules:
         mode: importMode,
       })
 
-      toast.success(`Importação concluída: ${formatImportSummary(result)}`)
+      showTimedScreen("success", `Importação concluída: ${formatImportSummary(result)}`)
       if (result.errors.length > 0) {
         toast.warning(`Alguns itens falharam: ${result.errors[0].reason}`)
       }
@@ -298,8 +345,8 @@ Rules:
       setModalType(null)
       await fetchWords()
     } catch (error) {
-      toast.error("Não foi possível importar o JSON.")
       console.error("Erro ao importar JSON:", error)
+      showTimedScreen("error", "Não foi possível importar o JSON.")
     } finally {
       setIsLoading(false)
     }
@@ -327,7 +374,7 @@ Rules:
         mode: importMode,
       })
 
-      toast.success(`Importação concluída: ${formatImportSummary(result)}`)
+      showTimedScreen("success", `Importação concluída: ${formatImportSummary(result)}`)
       if (result.errors.length > 0) {
         toast.warning(`Alguns itens falharam: ${result.errors[0].reason}`)
       }
@@ -335,8 +382,8 @@ Rules:
       setModalType(null)
       await fetchWords()
     } catch (error) {
-      toast.error("Não foi possível importar o arquivo.")
       console.error("Erro ao importar arquivo:", error)
+      showTimedScreen("error", "Não foi possível importar o arquivo.")
     } finally {
       setIsLoading(false)
     }
@@ -348,6 +395,22 @@ Rules:
         <LoadingScreen
           title="Quase lá..."
           content={loadingMessage}
+        />
+      )}
+
+      {!isLoading && successMessage && (
+        <LoadingScreen
+          title="Tudo certo"
+          content={successMessage}
+          variant="success"
+        />
+      )}
+
+      {!isLoading && errorMessage && (
+        <LoadingScreen
+          title="Nao foi possivel concluir"
+          content={errorMessage}
+          variant="error"
         />
       )}
 
@@ -437,6 +500,41 @@ Rules:
         onConfirm={addNewWord}
         onClose={() => setModalType(null)}
       />
+
+      <CreateItemModal
+        title="Editar palavra"
+        placeholder="Digite a palavra em ingles"
+        value={editingWordName}
+        isOpen={modalType === "edit"}
+        onChange={setEditingWordName}
+        onConfirm={confirmWordUpdated}
+        onClose={() => {
+          setEditingWord(null)
+          setEditingWordName("")
+          setModalType(null)
+        }}
+        confirmLabel="Salvar alteracoes"
+        isConfirmDisabled={!editingWordName.trim()}
+      />
+
+      <CreateItemModal
+        title="Excluir palavra"
+        isOpen={modalType === "delete"}
+        onConfirm={confirmWordDeleted}
+        onClose={() => {
+          setPendingDeleteWord(null)
+          setModalType(null)
+        }}
+        confirmLabel="Excluir palavra"
+      >
+        <div className="space-y-3 text-sm leading-6 text-slate-600">
+          <p>
+            Tem certeza de que deseja excluir a palavra{" "}
+            <span className="font-semibold text-slate-900">{pendingDeleteWord?.english}</span>?
+          </p>
+          <p>Essa ação remove a palavra desta categoria para o usuário atual.</p>
+        </div>
+      </CreateItemModal>
 
       <CreateItemModal
         title="Importar Palavras via JSON"

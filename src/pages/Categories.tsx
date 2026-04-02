@@ -14,9 +14,30 @@ const Categories = () => {
   const [categories, setCategories] = useState<Category[]>([])
   const [newCategory, setNewCategory] = useState("")
   const [showForm, setShowForm] = useState(false)
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+  const [editingCategoryName, setEditingCategoryName] = useState("")
+  const [pendingDeleteCategory, setPendingDeleteCategory] = useState<Category | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState("Estamos criando sua nova categoria")
+  const [successMessage, setSuccessMessage] = useState("")
+  const [errorMessage, setErrorMessage] = useState("")
   const hasCategories = categories.length > 0
+
+  const showTimedScreen = (type: "success" | "error", message: string) => {
+    if (type === "success") {
+      setSuccessMessage(message)
+    } else {
+      setErrorMessage(message)
+    }
+
+    window.setTimeout(() => {
+      if (type === "success") {
+        setSuccessMessage("")
+      } else {
+        setErrorMessage("")
+      }
+    }, 1600)
+  }
 
   const pageSummary = useMemo(() => {
     if (!hasCategories) {
@@ -54,64 +75,75 @@ const Categories = () => {
       return
     }
 
-    setLoadingMessage("Estamos criando sua nova categoria")
-    setIsLoading(true)
-
     try {
       setShowForm(false)
+      setLoadingMessage("Estamos criando sua nova categoria")
+      setIsLoading(true)
+
       const response = await createCategory({
         name: newCategory.trim(),
         userId,
       })
 
-      toast.success(response.detail ?? "Categoria criada com sucesso.")
       setNewCategory("")
       await fetchCategories()
+      showTimedScreen("success", response.detail ?? "Sua categoria foi criada com sucesso.")
     } catch (error) {
-      toast.error("Não foi possível criar a categoria.")
       console.error("Erro ao criar categoria:", error)
+      showTimedScreen("error", "Não foi possível criar a categoria.")
     } finally {
       setIsLoading(false)
     }
   }
 
   const handleEditCategory = async (category: Category) => {
-    if (!userId) {
+    setEditingCategory(category)
+    setEditingCategoryName(category.name)
+  }
+
+  const confirmEditCategory = async () => {
+    if (!editingCategory || !userId) {
       toast.error("Usuário inválido.")
       return
     }
 
-    const nextName = window.prompt("Editar categoria:", category.name)?.trim()
-    if (!nextName || nextName === category.name) return
+    const nextName = editingCategoryName.trim()
+    if (!nextName || nextName === editingCategory.name) {
+      setEditingCategory(null)
+      setEditingCategoryName("")
+      return
+    }
 
+    setEditingCategory(null)
+    setEditingCategoryName("")
     setLoadingMessage("Estamos atualizando sua categoria")
     setIsLoading(true)
 
     try {
       const response = await updateCategory({
-        categoryId: category.id,
+        categoryId: editingCategory.id,
         name: nextName,
         userId,
       })
 
-      toast.success(response.detail ?? "Categoria atualizada com sucesso.")
       await fetchCategories()
+      showTimedScreen("success", response.detail ?? "Sua categoria foi atualizada com sucesso.")
     } catch (error) {
-      toast.error("Não foi possível atualizar a categoria.")
       console.error("Erro ao atualizar categoria:", error)
+      showTimedScreen("error", "Não foi possível atualizar a categoria.")
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleDeleteCategory = async (category: Category) => {
-    if (!userId) {
+  const confirmDeleteCategory = async () => {
+    if (!pendingDeleteCategory || !userId) {
       toast.error("Usuário inválido.")
       return
     }
 
-    const confirmed = window.confirm(`Deseja excluir a categoria "${category.name}"?`)
-    if (!confirmed) return
+    const category = pendingDeleteCategory
+    setPendingDeleteCategory(null)
 
     setLoadingMessage("Estamos removendo sua categoria")
     setIsLoading(true)
@@ -122,14 +154,31 @@ const Categories = () => {
         userId,
       })
 
-      toast.success(response.detail ?? "Categoria removida com sucesso.")
       await fetchCategories()
+      showTimedScreen("success", response.detail ?? "Sua categoria foi removida com sucesso.")
     } catch (error) {
-      toast.error("Não foi possível excluir a categoria.")
       console.error("Erro ao excluir categoria:", error)
+      showTimedScreen("error", "Não foi possível excluir a categoria.")
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const closeEditCategoryModal = () => {
+    setEditingCategory(null)
+    setEditingCategoryName("")
+  }
+
+  const closeDeleteCategoryModal = () => {
+    setPendingDeleteCategory(null)
+  }
+
+  const handleDeleteCategoryLegacyGuard = async (category: Category) => {
+    if (!userId) {
+      toast.error("Usuário inválido.")
+      return
+    }
+    setPendingDeleteCategory(category)
   }
 
   return (
@@ -138,6 +187,22 @@ const Categories = () => {
         <LoadingScreen
           title="Quase lá..."
           content={loadingMessage}
+        />
+      )}
+
+      {!isLoading && successMessage && (
+        <LoadingScreen
+          title="Tudo certo"
+          content={successMessage}
+          variant="success"
+        />
+      )}
+
+      {!isLoading && errorMessage && (
+        <LoadingScreen
+          title="Nao foi possivel concluir"
+          content={errorMessage}
+          variant="error"
         />
       )}
 
@@ -183,7 +248,7 @@ const Categories = () => {
             key={category.id}
             category={category}
             onEdit={handleEditCategory}
-            onDelete={handleDeleteCategory}
+            onDelete={handleDeleteCategoryLegacyGuard}
           />
         ))}
       </Grid>
@@ -203,6 +268,34 @@ const Categories = () => {
         onConfirm={addNewCategory}
         onClose={() => setShowForm(false)}
       />
+
+      <CreateItemModal
+        title="Editar categoria"
+        placeholder="Digite o novo nome da categoria"
+        value={editingCategoryName}
+        isOpen={Boolean(editingCategory)}
+        onChange={setEditingCategoryName}
+        onConfirm={confirmEditCategory}
+        onClose={closeEditCategoryModal}
+        confirmLabel="Salvar alteracoes"
+        isConfirmDisabled={!editingCategoryName.trim()}
+      />
+
+      <CreateItemModal
+        title="Excluir categoria"
+        isOpen={Boolean(pendingDeleteCategory)}
+        onConfirm={confirmDeleteCategory}
+        onClose={closeDeleteCategoryModal}
+        confirmLabel="Excluir categoria"
+      >
+        <div className="space-y-3 text-sm leading-6 text-slate-600">
+          <p>
+            Tem certeza de que deseja excluir a categoria{" "}
+            <span className="font-semibold text-slate-900">{pendingDeleteCategory?.name}</span>?
+          </p>
+          <p>Essa ação remove a categoria da lista vinculada ao usuário atual.</p>
+        </div>
+      </CreateItemModal>
     </div>
   )
 }

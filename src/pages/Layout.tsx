@@ -11,11 +11,12 @@ const Layout = () => {
   const profileMatch = location.pathname.match(/^\/profile\/([^/]+)\/?$/)
   const categoriesMatch = location.pathname.match(/^\/profile\/([^/]+)\/categories\/?$/)
   const wordsMatch = location.pathname.match(/^\/profile\/([^/]+)\/words\/?$/)
+  const textsMatch = location.pathname.match(/^\/profile\/([^/]+)\/texts\/?$/)
   const categoryMatch = location.pathname.match(/^\/profile\/([^/]+)\/category\/([^/]+)\/?$/)
 
   // Os botões flutuantes aparecem apenas nas telas de perfil e conteúdo.
   const showFloatingHistory =
-    Boolean(profileMatch || categoriesMatch || wordsMatch || categoryMatch)
+    Boolean(profileMatch || categoriesMatch || wordsMatch || textsMatch || categoryMatch)
 
   // O botão de voltar navega para um destino conhecido, sem depender do histórico do navegador.
   let backPath: string | null = null
@@ -26,8 +27,8 @@ const Layout = () => {
     backPath = "/"
   }
 
-  if (categoriesMatch || wordsMatch || categoryMatch) {
-    const userId = categoriesMatch?.[1] || wordsMatch?.[1] || categoryMatch?.[1]
+  if (categoriesMatch || wordsMatch || textsMatch || categoryMatch) {
+    const userId = categoriesMatch?.[1] || wordsMatch?.[1] || textsMatch?.[1] || categoryMatch?.[1]
     backPath = userId ? `/profile/${userId}` : null
   }
 

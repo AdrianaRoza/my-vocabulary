@@ -46,26 +46,32 @@ const Profile = () => {
         </p>
       </div>
 
-      <div className="mx-auto mt-10 grid max-w-4xl grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mx-auto mt-5 grid max-w-7xl grid-cols-2 gap-2 px-4 sm:gap-4 lg:gap-5 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
         <Link
           to={`/profile/${userId}/categories/`}
-          className="flex aspect-5/8 w-full items-center justify-center rounded-2xl bg-linear-to-r from-gray-900 to-blue-800 text-[clamp(0.85rem,2.5vw,1.125rem)] font-medium text-white shadow-lg transition hover:scale-105 hover:shadow-2xl"
+          className="mx-auto flex aspect-5/8 w-full md:max-w-[10.5rem] lg:max-w-[11rem] xl:max-w-[11.25rem] 2xl:max-w-[11.5rem] items-center justify-center rounded-2xl bg-linear-to-r from-gray-900 to-blue-800 px-2 sm:px-3 text-center font-medium text-white shadow-lg transition hover:scale-105 hover:shadow-2xl"
         >
-          Categorias
+          <span className="max-w-[88%] text-center text-[clamp(0.62rem,1.7vw,1rem)] leading-tight break-normal">
+            Categorias
+          </span>
         </Link>
 
         <Link
           to={`/profile/${userId}/words`}
-          className="flex aspect-5/8 w-full items-center justify-center rounded-2xl bg-linear-to-l from-gray-900 to-blue-800 text-[clamp(0.85rem,2.5vw,1.125rem)] font-medium text-white shadow-lg transition hover:scale-105 hover:shadow-2xl"
+          className="mx-auto flex aspect-5/8 w-full md:max-w-[10.5rem] lg:max-w-[11rem] xl:max-w-[11.25rem] 2xl:max-w-[11.5rem] items-center justify-center rounded-2xl bg-linear-to-l from-gray-900 to-blue-800 px-2 sm:px-3 text-center font-medium text-white shadow-lg transition hover:scale-105 hover:shadow-2xl"
         >
-          Palavras
+          <span className="max-w-[88%] text-center text-[clamp(0.62rem,1.7vw,1rem)] leading-tight break-normal">
+            Palavras
+          </span>
         </Link>
 
         <Link
           to={`/profile/${userId}/texts`}
-          className="flex aspect-5/8 w-full items-center justify-center rounded-2xl bg-linear-to-r from-blue-800 to-gray-900 text-[clamp(0.85rem,2.5vw,1.125rem)] font-medium text-white shadow-lg transition hover:scale-105 hover:shadow-2xl"
+          className="mx-auto flex aspect-5/8 w-full md:max-w-[10.5rem] lg:max-w-[11rem] xl:max-w-[11.25rem] 2xl:max-w-[11.5rem] items-center justify-center rounded-2xl bg-linear-to-r from-blue-800 to-gray-900 px-2 sm:px-3 text-center font-medium text-white shadow-lg transition hover:scale-105 hover:shadow-2xl"
         >
-          Textos
+          <span className="max-w-[88%] text-center text-[clamp(0.62rem,1.7vw,1rem)] leading-tight break-normal">
+            Textos
+          </span>
         </Link>
       </div>
     </div>

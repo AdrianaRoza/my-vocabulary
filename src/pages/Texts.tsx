@@ -21,6 +21,24 @@ const Texts = () => {
   const [pendingDeleteText, setPendingDeleteText] = useState<TextEntry | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState("Estamos processando seu texto")
+  const [successMessage, setSuccessMessage] = useState("")
+  const [errorMessage, setErrorMessage] = useState("")
+
+  const showTimedScreen = (type: "success" | "error", message: string) => {
+    if (type === "success") {
+      setSuccessMessage(message)
+    } else {
+      setErrorMessage(message)
+    }
+
+    window.setTimeout(() => {
+      if (type === "success") {
+        setSuccessMessage("")
+      } else {
+        setErrorMessage("")
+      }
+    }, 1600)
+  }
 
   const hasTexts = texts.length > 0
 
@@ -83,21 +101,22 @@ const Texts = () => {
       return
     }
 
+    setModalType(null)
     setLoadingMessage("Estamos gerando seu texto com IA")
     setIsLoading(true)
 
     try {
-      const response = await generateText({
+      await generateText({
         userId,
         topic: topic.trim(),
       })
 
-      toast.success(response.detail ?? "Texto gerado com sucesso.")
       resetModalState()
       await fetchTexts()
+      showTimedScreen("success", "Seu texto foi gerado e ja esta disponivel para leitura.")
     } catch (error) {
       console.error("Erro ao gerar texto:", error)
-      toast.error("Nao foi possivel gerar o texto.")
+      showTimedScreen("error", "Nao foi possivel gerar o texto.")
     } finally {
       setIsLoading(false)
     }
@@ -124,12 +143,12 @@ const Texts = () => {
         portuguese: manualPortuguese.trim(),
       })
 
-      toast.success(response.detail ?? "Texto criado com sucesso.")
       resetModalState()
       await fetchTexts()
+      showTimedScreen("success", response.detail ?? "Seu texto foi criado e ja esta disponivel para leitura.")
     } catch (error) {
       console.error("Erro ao criar texto manual:", error)
-      toast.error("Nao foi possivel criar o texto manual.")
+      showTimedScreen("error", "Nao foi possivel criar o texto manual.")
     } finally {
       setIsLoading(false)
     }
@@ -157,12 +176,12 @@ const Texts = () => {
         portuguese: manualPortuguese.trim(),
       })
 
-      toast.success(response.detail ?? "Texto atualizado com sucesso.")
       resetModalState()
       await fetchTexts()
+      showTimedScreen("success", response.detail ?? "Seu texto foi atualizado com sucesso.")
     } catch (error) {
       console.error("Erro ao atualizar texto:", error)
-      toast.error("Nao foi possivel atualizar o texto.")
+      showTimedScreen("error", "Nao foi possivel atualizar o texto.")
     } finally {
       setIsLoading(false)
     }
@@ -183,12 +202,12 @@ const Texts = () => {
         userId,
       })
 
-      toast.success(response.detail ?? "Texto removido com sucesso.")
       resetModalState()
       await fetchTexts()
+      showTimedScreen("success", response.detail ?? "Seu texto foi removido com sucesso.")
     } catch (error) {
       console.error("Erro ao excluir texto:", error)
-      toast.error("Nao foi possivel excluir o texto.")
+      showTimedScreen("error", "Nao foi possivel excluir o texto.")
     } finally {
       setIsLoading(false)
     }
@@ -196,6 +215,29 @@ const Texts = () => {
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-10 pt-6">
+      {isLoading && (
+        <LoadingScreen
+          title="Quase la..."
+          content={loadingMessage}
+        />
+      )}
+
+      {!isLoading && successMessage && (
+        <LoadingScreen
+          title="Tudo certo"
+          content={successMessage}
+          variant="success"
+        />
+      )}
+
+      {!isLoading && errorMessage && (
+        <LoadingScreen
+          title="Nao foi possivel concluir"
+          content={errorMessage}
+          variant="error"
+        />
+      )}
+
       <section className="overflow-hidden rounded-[2rem] bg-linear-to-br from-slate-950 via-slate-900 to-blue-900 text-white shadow-xl">
         <div className="grid gap-6 px-6 py-8 md:grid-cols-[1.35fr_0.95fr] md:px-8">
           <div className="space-y-4">
