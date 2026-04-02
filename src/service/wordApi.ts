@@ -24,6 +24,8 @@ type CreateWordPayload = {
   english: string
   userId: string
   categoryId: string
+  grammarClassSlugs?: string[]
+  useAiGrammarClassification?: boolean
 }
 
 type UpdateWordPayload = {
@@ -31,6 +33,8 @@ type UpdateWordPayload = {
   english: string
   userId: string
   categoryId: string
+  grammarClassSlugs?: string[]
+  useAiGrammarClassification?: boolean
 }
 
 type DeleteWordPayload = {
@@ -83,21 +87,38 @@ export const getWordsByCategory = async ({ userId, categoryId }: GetWordsPayload
 }
 
 // Cria uma nova palavra vinculada ao usuário e à categoria.
-export const createWord = async ({ english, userId, categoryId }: CreateWordPayload) => {
+export const createWord = async ({
+  english,
+  userId,
+  categoryId,
+  grammarClassSlugs = [],
+  useAiGrammarClassification = false,
+}: CreateWordPayload) => {
   const response = await apiClient.post<WordMutationResponse>("/api/vocabulary/word", {
     english,
     user_id: userId,
     category_id: categoryId,
+    grammar_class_slugs: grammarClassSlugs,
+    use_ai_grammar_classification: useAiGrammarClassification,
   })
 
   return response.data
 }
 
-export const updateWord = async ({ wordId, english, userId, categoryId }: UpdateWordPayload) => {
+export const updateWord = async ({
+  wordId,
+  english,
+  userId,
+  categoryId,
+  grammarClassSlugs = [],
+  useAiGrammarClassification = false,
+}: UpdateWordPayload) => {
   const response = await apiClient.put<WordMutationResponse>(`/api/vocabulary/word/${wordId}`, {
     english,
     user_id: userId,
     category_id: categoryId,
+    grammar_class_slugs: grammarClassSlugs,
+    use_ai_grammar_classification: useAiGrammarClassification,
   })
 
   return response.data

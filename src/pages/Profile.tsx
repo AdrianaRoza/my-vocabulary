@@ -73,6 +73,15 @@ const Profile = () => {
             Textos
           </span>
         </Link>
+
+        <Link
+          to={`/profile/${userId}/grammar-classes`}
+          className="mx-auto flex aspect-5/8 w-full md:max-w-[10.5rem] lg:max-w-[11rem] xl:max-w-[11.25rem] 2xl:max-w-[11.5rem] items-center justify-center rounded-2xl bg-linear-to-r from-gray-900 to-blue-800 px-2 sm:px-3 text-center font-medium text-white shadow-lg transition hover:scale-105 hover:shadow-2xl"
+        >
+          <span className="max-w-[88%] text-center text-[clamp(0.62rem,1.7vw,1rem)] leading-tight break-normal">
+            Classes gramaticais
+          </span>
+        </Link>
       </div>
     </div>
   )

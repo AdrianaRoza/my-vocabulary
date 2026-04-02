@@ -1,4 +1,5 @@
 import type { Phrase } from "./phrase";
+import type { GrammarClassSummary } from "./grammarClass";
 
 export interface Word {
   id: string;
@@ -9,4 +10,5 @@ export interface Word {
   audioUrl: string;
   categoryIds?: string[];
   userId: string
+  grammarClasses?: GrammarClassSummary[]
 }

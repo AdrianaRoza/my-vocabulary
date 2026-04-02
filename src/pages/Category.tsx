@@ -7,6 +7,7 @@ import CreateItemModal from "../components/CreateItemModal"
 import Grid from "../components/Grid"
 import LoadingScreen from "../components/LoadingScreen"
 import { getCategoriesByUser } from "../service/categoryApi"
+import { getGrammarClassesByUser } from "../service/grammarClassApi"
 import {
   createWord,
   deleteWord,
@@ -17,9 +18,11 @@ import {
   type ImportMode,
   type WordImportItem,
 } from "../service/wordApi"
+import type { GrammarClassSummary } from "../types/grammarClass"
 import type { Word } from "../types/word"
 
 type ModalType = "create" | "edit" | "delete" | "importJson" | "importFile" | null
+type GrammarSelectionMode = "manual" | "ai"
 
 type ImportPayloadLike = {
   items?: WordImportItem[]
@@ -99,6 +102,9 @@ const Category = () => {
   const [editingWord, setEditingWord] = useState<Word | null>(null)
   const [editingWordName, setEditingWordName] = useState("")
   const [pendingDeleteWord, setPendingDeleteWord] = useState<Word | null>(null)
+  const [grammarClasses, setGrammarClasses] = useState<GrammarClassSummary[]>([])
+  const [selectedGrammarClassSlugs, setSelectedGrammarClassSlugs] = useState<string[]>([])
+  const [grammarSelectionMode, setGrammarSelectionMode] = useState<GrammarSelectionMode>("manual")
   const [modalType, setModalType] = useState<ModalType>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState("Estamos processando sua solicitação")
@@ -197,6 +203,31 @@ Rules:
     void fetchWords()
   }, [categoryId, userId])
 
+  useEffect(() => {
+    let isMounted = true
+
+    const loadGrammarClasses = async () => {
+      if (!userId) {
+        if (isMounted) setGrammarClasses([])
+        return
+      }
+
+      try {
+        const data = await getGrammarClassesByUser(userId)
+        if (isMounted) setGrammarClasses(data)
+      } catch (error) {
+        console.error("Erro ao carregar classes gramaticais:", error)
+        if (isMounted) setGrammarClasses([])
+      }
+    }
+
+    void loadGrammarClasses()
+
+    return () => {
+      isMounted = false
+    }
+  }, [userId])
+
   // Descobre o nome da categoria atual para exibir no título da página.
   useEffect(() => {
     void fetchCategoryTitle()
@@ -222,9 +253,13 @@ Rules:
         english: newWord.trim(),
         userId,
         categoryId,
+        grammarClassSlugs: selectedGrammarClassSlugs,
+        useAiGrammarClassification: grammarSelectionMode === "ai",
       })
 
       setNewWord("")
+      setSelectedGrammarClassSlugs([])
+      setGrammarSelectionMode("manual")
       await fetchWords()
       showTimedScreen("success", response.detail ?? "Sua palavra foi criada com sucesso.")
     } catch (error) {
@@ -238,6 +273,8 @@ Rules:
   const handleWordUpdated = (word: Word) => {
     setEditingWord(word)
     setEditingWordName(word.english)
+    setSelectedGrammarClassSlugs(word.grammarClasses?.map((item) => item.slug) ?? [])
+    setGrammarSelectionMode("manual")
     setModalType("edit")
   }
 
@@ -256,6 +293,8 @@ Rules:
     if (!nextEnglish || nextEnglish === editingWord.english) {
       setEditingWord(null)
       setEditingWordName("")
+      setSelectedGrammarClassSlugs([])
+      setGrammarSelectionMode("manual")
       setModalType(null)
       return
     }
@@ -263,6 +302,8 @@ Rules:
     const word = editingWord
     setEditingWord(null)
     setEditingWordName("")
+    setSelectedGrammarClassSlugs([])
+    setGrammarSelectionMode("manual")
     setModalType(null)
     setLoadingMessage("Estamos atualizando sua palavra")
     setIsLoading(true)
@@ -273,6 +314,8 @@ Rules:
         english: nextEnglish,
         userId,
         categoryId,
+        grammarClassSlugs: selectedGrammarClassSlugs,
+        useAiGrammarClassification: grammarSelectionMode === "ai",
       })
 
       await fetchWords()
@@ -493,29 +536,196 @@ Rules:
 
       <CreateItemModal
         title="Nova Palavra"
-        placeholder="Digite a palavra"
-        value={newWord}
         isOpen={modalType === "create"}
-        onChange={setNewWord}
         onConfirm={addNewWord}
-        onClose={() => setModalType(null)}
-      />
+        onClose={() => {
+          setNewWord("")
+          setSelectedGrammarClassSlugs([])
+          setGrammarSelectionMode("manual")
+          setModalType(null)
+        }}
+        confirmLabel="Adicionar palavra"
+        isConfirmDisabled={!newWord.trim()}
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-700">Palavra em ingles</label>
+            <input
+              value={newWord}
+              onChange={(event) => setNewWord(event.target.value)}
+            className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-blue-500"
+              placeholder="Digite a palavra"
+            />
+          </div>
+
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-slate-700">Definição da classe gramatical</p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setGrammarSelectionMode("manual")}
+                className={`rounded-xl border px-4 py-3 text-left text-sm transition ${
+                  grammarSelectionMode === "manual"
+                    ? "border-blue-600 bg-blue-50 text-blue-900"
+                    : "border-slate-200 bg-white text-slate-700"
+                }`}
+              >
+                <span className="block font-medium">Escolher manualmente</span>
+                <span className="mt-1 block text-xs opacity-80">Você marca uma ou mais classes.</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setGrammarSelectionMode("ai")}
+                className={`rounded-xl border px-4 py-3 text-left text-sm transition ${
+                  grammarSelectionMode === "ai"
+                    ? "border-blue-600 bg-blue-50 text-blue-900"
+                    : "border-slate-200 bg-white text-slate-700"
+                }`}
+              >
+                <span className="block font-medium">Deixar a IA decidir</span>
+                <span className="mt-1 block text-xs opacity-80">A IA escolhe uma classe para a palavra.</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-slate-700">Classes gramaticais</p>
+            {grammarSelectionMode === "manual" ? (
+              <div className="grid gap-2 sm:grid-cols-2">
+              {grammarClasses.map((grammarClass) => {
+                const checked = selectedGrammarClassSlugs.includes(grammarClass.slug)
+
+                return (
+                  <label
+                    key={grammarClass.slug}
+                    className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-sm transition ${
+                      checked
+                        ? "border-blue-600 bg-blue-50 text-blue-900"
+                        : "border-slate-200 bg-white text-slate-700"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() =>
+                        setSelectedGrammarClassSlugs((current) =>
+                          checked
+                            ? current.filter((slug) => slug !== grammarClass.slug)
+                            : [...current, grammarClass.slug]
+                        )
+                      }
+                    />
+                    <span>{grammarClass.name}</span>
+                  </label>
+                )
+              })}
+              </div>
+            ) : (
+              <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
+                Ao salvar, a IA vai escolher automaticamente a classe gramatical mais adequada.
+              </p>
+            )}
+          </div>
+        </div>
+      </CreateItemModal>
 
       <CreateItemModal
         title="Editar palavra"
-        placeholder="Digite a palavra em ingles"
-        value={editingWordName}
         isOpen={modalType === "edit"}
-        onChange={setEditingWordName}
         onConfirm={confirmWordUpdated}
         onClose={() => {
           setEditingWord(null)
           setEditingWordName("")
+          setSelectedGrammarClassSlugs([])
+          setGrammarSelectionMode("manual")
           setModalType(null)
         }}
         confirmLabel="Salvar alteracoes"
         isConfirmDisabled={!editingWordName.trim()}
-      />
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-700">Palavra em ingles</label>
+            <input
+              value={editingWordName}
+              onChange={(event) => setEditingWordName(event.target.value)}
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none transition focus:border-blue-500"
+              placeholder="Digite a palavra em ingles"
+            />
+          </div>
+
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-slate-700">Definição da classe gramatical</p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setGrammarSelectionMode("manual")}
+                className={`rounded-xl border px-4 py-3 text-left text-sm transition ${
+                  grammarSelectionMode === "manual"
+                    ? "border-blue-600 bg-blue-50 text-blue-900"
+                    : "border-slate-200 bg-white text-slate-700"
+                }`}
+              >
+                <span className="block font-medium">Escolher manualmente</span>
+                <span className="mt-1 block text-xs opacity-80">Você ajusta as classes desta palavra.</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setGrammarSelectionMode("ai")}
+                className={`rounded-xl border px-4 py-3 text-left text-sm transition ${
+                  grammarSelectionMode === "ai"
+                    ? "border-blue-600 bg-blue-50 text-blue-900"
+                    : "border-slate-200 bg-white text-slate-700"
+                }`}
+              >
+                <span className="block font-medium">Recalcular com IA</span>
+                <span className="mt-1 block text-xs opacity-80">A IA substitui a classe atual por uma sugestão.</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-slate-700">Classes gramaticais</p>
+            {grammarSelectionMode === "manual" ? (
+              <div className="grid gap-2 sm:grid-cols-2">
+              {grammarClasses.map((grammarClass) => {
+                const checked = selectedGrammarClassSlugs.includes(grammarClass.slug)
+
+                return (
+                  <label
+                    key={grammarClass.slug}
+                    className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-sm transition ${
+                      checked
+                        ? "border-blue-600 bg-blue-50 text-blue-900"
+                        : "border-slate-200 bg-white text-slate-700"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() =>
+                        setSelectedGrammarClassSlugs((current) =>
+                          checked
+                            ? current.filter((slug) => slug !== grammarClass.slug)
+                            : [...current, grammarClass.slug]
+                        )
+                      }
+                    />
+                    <span>{grammarClass.name}</span>
+                  </label>
+                )
+              })}
+              </div>
+            ) : (
+              <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
+                Ao salvar, a IA vai recalcular automaticamente a classe gramatical desta palavra.
+              </p>
+            )}
+          </div>
+        </div>
+      </CreateItemModal>
 
       <CreateItemModal
         title="Excluir palavra"
